@@ -91,6 +91,7 @@ public class Hello implements EntryPoint {
 	    nameField.setText("Gwt User");
         // We can add style names to widgets
         sendButton.addStyleName("sendButton");
+        sendButton.addStyleName("red");
         
         // Focus the cursor on the name field when the app loads
         nameField.setFocus(true);
@@ -147,7 +148,7 @@ public class Hello implements EntryPoint {
                 errorLabel.setText("");
                 String textToServer = nameField.getText();
                 if (!FieldVerifier.isValidName(textToServer)) {
-                    errorLabel.setText("Please enter more than 4 caracters");
+                    errorLabel.setText("Please enter at least 4 characters");
                     return;
                 }
 
@@ -182,6 +183,22 @@ public class Hello implements EntryPoint {
         MyHandler handler = new MyHandler();
         sendButton.addClickHandler(handler);
         nameField.addKeyUpHandler(handler);
+        
+        // Add the handler on the button 'Clear person information' the clear the person's text box. 
+        clearPersonButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				personId.setText("");
+				personName.setText("");
+			}
+		});
+        
+        countCallButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				onGetCountCall();
+			}
+		});
 
         /* Layout for person information*/
         FlexTable layout = new FlexTable();
@@ -243,6 +260,28 @@ public class Hello implements EntryPoint {
 	private void updatePersonInformation(PersonInfo person){
 		personId.setText(String.valueOf(person.getPersonID()));
 		personName.setText(person.getName());
+	}
+	
+	private void onGetCountCall(){
+		int count = 0;
+		
+		countCallService.countCall(count, new AsyncCallback<Integer>() {
+			@Override
+			public void onFailure(Throwable caught) {
+	            caught.printStackTrace();
+	            Window.alert("Error : " + caught.getMessage());
+			}
+
+			@Override
+			public void onSuccess(Integer result) {
+				updateCallCount(result);
+			}
+			
+		});
+	}
+	
+	private void updateCallCount(Integer count) {
+		countCallLabel.setText(count.toString());
 	}
 	
 }
